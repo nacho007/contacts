@@ -13,7 +13,9 @@ import android.provider.ContactsContract;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.SimpleItemAnimator;
 import android.util.Log;
+import android.view.View;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -28,12 +30,15 @@ public class MainActivity extends AppCompatActivity {
     @BindView(R.id.recycler)
     RecyclerView recycler;
 
+    AdapterContact contactAdapter;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
         recycler.setLayoutManager(new LinearLayoutManager(this));
+        ((SimpleItemAnimator) recycler.getItemAnimator()).setSupportsChangeAnimations(false);
         checkPermissions();
     }
 
@@ -76,7 +81,7 @@ public class MainActivity extends AppCompatActivity {
                 selection, null, ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME + " ASC");
 
         cursor.moveToFirst();
-        while (cursor.isAfterLast() == false) {
+        while (!cursor.isAfterLast()) {
 
             size++;
 
@@ -90,14 +95,8 @@ public class MainActivity extends AppCompatActivity {
             Uri contactUri = ContentUris.withAppendedId(ContactsContract.Contacts.CONTENT_URI, contactID);
             Uri displayPhotoUri = Uri.withAppendedPath(contactUri, ContactsContract.Contacts.Photo.DISPLAY_PHOTO);
 
-
-//            String photoDisplay = openDisplayPhoto(contactID, this);
-
             Contact contact = new Contact(contactName, contactNumber);
             contact.setPhotoUri(displayPhotoUri.toString());
-
-//            if(photoDisplay != null) contact.setPhotoUri(photoDisplay.toString());
-//            if(photo != null) contact.setPhotoUri(photo.toString());
 
             contact.setContactID(contactID);
 
@@ -112,7 +111,7 @@ public class MainActivity extends AppCompatActivity {
         cursor = null;
 
 
-        AdapterContact contactAdapter = new AdapterContact(contacts);
+        contactAdapter = new AdapterContact(contacts);
         recycler.setAdapter(contactAdapter);
 
         endnow = android.os.SystemClock.uptimeMillis();
@@ -120,6 +119,10 @@ public class MainActivity extends AppCompatActivity {
         Log.d("END", "Contacts Size " + size);
     }
 
+
+    public void onClick(View v){
+        contactAdapter.notifyDataSetChanged();
+    }
 
     public String openDisplayPhoto(long contactId, Context context) {
         Uri contactUri = ContentUris.withAppendedId(ContactsContract.Contacts.CONTENT_URI, contactId);

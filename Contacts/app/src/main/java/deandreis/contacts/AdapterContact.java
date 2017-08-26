@@ -10,6 +10,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -25,7 +26,6 @@ import java.util.ArrayList;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import de.hdodenhof.circleimageview.CircleImageView;
 
 /**
  * Created by ignaciodeandreisdenis on 25/8/17.
@@ -78,7 +78,7 @@ public class AdapterContact extends RecyclerView.Adapter<RecyclerView.ViewHolder
         LinearLayout adapter_contact_row_linearlayout;
 
         @BindView(R.id.adapter_contact_row_circleimageview)
-        CircleImageView adapter_contact_row_circleimageview;
+        ImageView adapter_contact_row_circleimageview;
 
         @BindView(R.id.adapter_contact_row_textview_name)
         TextView adapter_contact_row_textview_name;
@@ -99,15 +99,14 @@ public class AdapterContact extends RecyclerView.Adapter<RecyclerView.ViewHolder
             adapter_contact_row_textview_number.setText(contact.getNumber());
 
 
-            //content://com.android.contacts/contacts/117/display_photo
-
+//            adapter_contact_row_circleimageview.setImageResource(R.mipmap.ic_launcher);
 
             if (contact.getPhotoUri() != null) {
-//                Log.e(TAG, contact.getPhotoUri());
-                Glide.with(context).load(contact.getPhotoUri()).listener(new RequestListener<String, GlideDrawable>() {
+
+                Glide.with(context).load(contact.getPhotoUri()).placeholder(R.mipmap.ic_launcher).listener(new RequestListener<String, GlideDrawable>() {
                     @Override
                     public boolean onException(Exception e, String model, Target<GlideDrawable> target, boolean isFirstResource) {
-                        Glide.with(context).load(R.mipmap.ic_launcher).into(adapter_contact_row_circleimageview);
+                        adapter_contact_row_circleimageview.setImageResource(R.mipmap.ic_launcher);
                         return true;
                     }
 
@@ -116,8 +115,6 @@ public class AdapterContact extends RecyclerView.Adapter<RecyclerView.ViewHolder
                         return false;
                     }
                 }).into(adapter_contact_row_circleimageview);
-            } else {
-                Glide.with(context).load(R.mipmap.ic_launcher).into(adapter_contact_row_circleimageview);
             }
 
             if (contact.getName() != null && !contact.getName().equals("")) {
