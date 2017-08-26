@@ -91,11 +91,12 @@ public class MainActivity extends AppCompatActivity {
             Uri displayPhotoUri = Uri.withAppendedPath(contactUri, ContactsContract.Contacts.Photo.DISPLAY_PHOTO);
 
 
-            String photoDisplay = openDisplayPhoto(contactID, this);
-//            String photo = openDisplayPhoto(contactID, this);
+//            String photoDisplay = openDisplayPhoto(contactID, this);
 
             Contact contact = new Contact(contactName, contactNumber);
-            if(photoDisplay != null) contact.setPhotoUri(photoDisplay.toString());
+            contact.setPhotoUri(displayPhotoUri.toString());
+
+//            if(photoDisplay != null) contact.setPhotoUri(photoDisplay.toString());
 //            if(photo != null) contact.setPhotoUri(photo.toString());
 
             contact.setContactID(contactID);
