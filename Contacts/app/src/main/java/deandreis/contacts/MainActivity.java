@@ -2,7 +2,9 @@ package deandreis.contacts;
 
 import android.Manifest;
 import android.content.ContentUris;
+import android.content.Context;
 import android.content.pm.PackageManager;
+import android.content.res.AssetFileDescriptor;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Build;
@@ -13,6 +15,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 
+import java.io.IOException;
 import java.util.ArrayList;
 
 import butterknife.BindView;
@@ -87,8 +90,15 @@ public class MainActivity extends AppCompatActivity {
             Uri contactUri = ContentUris.withAppendedId(ContactsContract.Contacts.CONTENT_URI, contactID);
             Uri displayPhotoUri = Uri.withAppendedPath(contactUri, ContactsContract.Contacts.Photo.DISPLAY_PHOTO);
 
+
+            String photoDisplay = openDisplayPhoto(contactID, this);
+//            String photo = openDisplayPhoto(contactID, this);
+
             Contact contact = new Contact(contactName, contactNumber);
-            contact.setPhotoUri(displayPhotoUri.toString());
+            if(photoDisplay != null) contact.setPhotoUri(photoDisplay.toString());
+//            if(photo != null) contact.setPhotoUri(photo.toString());
+
+            contact.setContactID(contactID);
 
             contacts.add(contact);
 
@@ -107,6 +117,41 @@ public class MainActivity extends AppCompatActivity {
         endnow = android.os.SystemClock.uptimeMillis();
         Log.d("END", "TimeForContacts " + (endnow - startnow) + " ms");
         Log.d("END", "Contacts Size " + size);
+    }
+
+
+    public String openDisplayPhoto(long contactId, Context context) {
+        Uri contactUri = ContentUris.withAppendedId(ContactsContract.Contacts.CONTENT_URI, contactId);
+        Uri displayPhotoUri = Uri.withAppendedPath(contactUri, ContactsContract.Contacts.Photo.DISPLAY_PHOTO);
+        try {
+            AssetFileDescriptor fd =
+                    context.getContentResolver().openAssetFileDescriptor(displayPhotoUri, "r");
+            return displayPhotoUri.toString();
+        } catch (IOException e) {
+            return null;
+        }
+    }
+
+
+    public String openPhoto(long contactId, Context context) {
+        Uri contactUri = ContentUris.withAppendedId(ContactsContract.Contacts.CONTENT_URI, contactId);
+        Uri photoUri = Uri.withAppendedPath(contactUri, ContactsContract.Contacts.Photo.CONTENT_DIRECTORY);
+        Cursor cursor = context.getContentResolver().query(photoUri,
+                new String[]{ContactsContract.Contacts.Photo.PHOTO}, null, null, null);
+        if (cursor == null) {
+            return null;
+        }
+        try {
+            if (cursor.moveToFirst()) {
+                byte[] data = cursor.getBlob(0);
+                if (data != null) {
+                    return photoUri.toString();
+                }
+            }
+        } finally {
+            cursor.close();
+        }
+        return null;
     }
 
 

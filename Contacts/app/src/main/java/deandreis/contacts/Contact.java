@@ -18,6 +18,7 @@ public class Contact implements Serializable {
     private String number;
     private boolean isRecent = false;
     private boolean astroPayUser;
+    private int contactID;
 
     public Contact() {
     }
@@ -93,4 +94,11 @@ public class Contact implements Serializable {
     }
 
 
+    public int getContactID() {
+        return contactID;
+    }
+
+    public void setContactID(int contactID) {
+        this.contactID = contactID;
+    }
 }
