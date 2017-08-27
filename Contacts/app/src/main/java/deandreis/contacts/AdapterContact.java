@@ -1,11 +1,6 @@
 package deandreis.contacts;
 
-import android.content.ContentUris;
 import android.content.Context;
-import android.content.res.AssetFileDescriptor;
-import android.database.Cursor;
-import android.net.Uri;
-import android.provider.ContactsContract;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -19,9 +14,6 @@ import com.bumptech.glide.load.resource.drawable.GlideDrawable;
 import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.target.Target;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 
 import butterknife.BindView;
@@ -98,9 +90,6 @@ public class AdapterContact extends RecyclerView.Adapter<RecyclerView.ViewHolder
             adapter_contact_row_textview_name.setText(contact.getName());
             adapter_contact_row_textview_number.setText(contact.getNumber());
 
-
-//            adapter_contact_row_circleimageview.setImageResource(R.mipmap.ic_launcher);
-
             if (contact.getPhotoUri() != null) {
 
                 Glide.with(context).load(contact.getPhotoUri()).placeholder(R.mipmap.ic_launcher).listener(new RequestListener<String, GlideDrawable>() {
@@ -124,42 +113,6 @@ public class AdapterContact extends RecyclerView.Adapter<RecyclerView.ViewHolder
             }
 
         }
-
-
-        public InputStream openPhoto(long contactId, Context context) {
-            Uri contactUri = ContentUris.withAppendedId(ContactsContract.Contacts.CONTENT_URI, contactId);
-            Uri photoUri = Uri.withAppendedPath(contactUri, ContactsContract.Contacts.Photo.CONTENT_DIRECTORY);
-            Cursor cursor = context.getContentResolver().query(photoUri,
-                    new String[]{ContactsContract.Contacts.Photo.PHOTO}, null, null, null);
-            if (cursor == null) {
-                return null;
-            }
-            try {
-                if (cursor.moveToFirst()) {
-                    byte[] data = cursor.getBlob(0);
-                    if (data != null) {
-                        return new ByteArrayInputStream(data);
-                    }
-                }
-            } finally {
-                cursor.close();
-            }
-            return null;
-        }
-
-
-        public InputStream openDisplayPhoto(long contactId, Context context) {
-            Uri contactUri = ContentUris.withAppendedId(ContactsContract.Contacts.CONTENT_URI, contactId);
-            Uri displayPhotoUri = Uri.withAppendedPath(contactUri, ContactsContract.Contacts.Photo.DISPLAY_PHOTO);
-            try {
-                AssetFileDescriptor fd =
-                        context.getContentResolver().openAssetFileDescriptor(displayPhotoUri, "r");
-                return fd.createInputStream();
-            } catch (IOException e) {
-                return null;
-            }
-        }
-
 
         public void bind(final Contact contact) {
 
